@@ -15,8 +15,8 @@ python remote_control.py
 ```
 
 2. Manual for the app
-'p': Ping the camera.
-'i': Camera zoom in.
-'o': Camera zoom out.
-'q': Exit camera controller.
-'h': Show the manual
+  'p': Ping the camera.
+  'i': Camera zoom in.
+  'o': Camera zoom out.
+  'q': Exit camera controller.
+  'h': Show the manual
