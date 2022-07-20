@@ -1,7 +1,22 @@
-# remote-control-camera
+# Remote-Control-For-Datavideo-Camera
 
-GET
-	http://192.168.100.99/cgi-bin/ptzctrl.cgi?5=&ptzcmd=&zoomout=
+The purpose of this app is to replace the web control with a command line control, which can be embedded to the Robotic in the future
 
-GET
-	http://192.168.100.99/cgi-bin/ptzctrl.cgi?5=&ptzcmd=&zoomstop=
+Installing Packages:
+```
+pip install requirements.txt
+```
+
+Controls manual
+
+1. Launch the app:
+```
+python remote_control.py
+```
+
+2. Manual for the app
+'p': Ping the camera.
+'i': Camera zoom in.
+'o': Camera zoom out.
+'q': Exit camera controller.
+'h': Show the manual
