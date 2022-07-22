@@ -4,7 +4,7 @@ The purpose of this app is to replace the web control with a command line contro
 
 Installing Packages:
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 Controls manual

@@ -1,6 +1,12 @@
-import requests
 import os
+import json
 import keyboard
+import urllib3.request
+import time
+
+## Lower the number, higher the accuracy
+## This number should smaller than 2
+accuracy = 0.15
 
 
 camera_hostname = "192.168.100.99" 
@@ -23,49 +29,57 @@ class Controller:
     def send_zoom_in_command(self):
         print("Send Zoom In Command")
         try:
-            response_zoom_in = requests.get('http://192.168.100.99/cgi-bin/ptzctrl.cgi?5=&ptzcmd=&zoomin=', timeout=2.50)
-        except requests.exceptions.Timeout:
+            http = urllib3.PoolManager()
+            response_zoom_in = http.request('GET', 'http://192.168.100.99/cgi-bin/ptzctrl.cgi?ptzcmd&zoomin&5',timeout=2.50)
+        except urllib3.exceptions.NewConnectionError:
         # Maybe set up for a retry, or continue in a retry loop
             print("Zoom in Command Timeout")
             return
         
+        time.sleep(accuracy)
+
         try:
-            response_stop = requests.get('http://192.168.100.99/cgi-bin/ptzctrl.cgi?5=&ptzcmd=&zoomstop=', timeout=2.50)
-        except requests.exceptions.Timeout:
+            response_stop = http.request('GET','http://192.168.100.99/cgi-bin/ptzctrl.cgi?ptzcmd&zoomstop&5', timeout=2.50)
+        except urllib3.exceptions.NewConnectionError:
         # Maybe set up for a retry, or continue in a retry loop
             print("Zoom stop Command Timeout")
             return
         
         
-        if (response_zoom_in.status_code == 200 and response_stop.status_code == 200):
+        if (response_zoom_in.status == 200 and response_stop.status == 200):
             print("Zoom in successfully")
         else:
             print("Zoom In Failure")
-            print('Response Content 1:\n',response_zoom_in.text)
-            print('Response Content 2:\n',response_stop.text)
+            print('Response Content 1:\n',response_zoom_in.data)
+            print('Response Content 2:\n',response_stop.data)
     
     def send_zoom_out_command(self):
         print("Send Zoom Out Command")
+        http = urllib3.PoolManager()
+
+        
         try:
-            response_zoom_out = requests.get('http://192.168.100.99/cgi-bin/ptzctrl.cgi?5=&ptzcmd=&zoomout=', timeout=2.50)
-        except requests.exceptions.Timeout:
+            response_zoom_out = http.request('GET','http://192.168.100.99/cgi-bin/ptzctrl.cgi?ptzcmd&zoomout&5', timeout=2.50)
+        except urllib3.exceptions.NewConnectionError:
+        # Maybe set up for a retry, or continue in a retry loop
+            print("Zoom Out Command Timeout\n")
+            return
+
+        time.sleep(accuracy)
+        
+        try:
+            response_stop = http.request('GET', 'http://192.168.100.99/cgi-bin/ptzctrl.cgi?ptzcmd&zoomstop&5', timeout=2.50)
+        except urllib3.exceptions.NewConnectionError:
         # Maybe set up for a retry, or continue in a retry loop
             print("Zoom Out Command Timeout\n")
             return
         
-        try:
-            response_stop = requests.get('http://192.168.100.99/cgi-bin/ptzctrl.cgi?5=&ptzcmd=&zoomstop=', timeout=2.50)
-        except requests.exceptions.Timeout:
-        # Maybe set up for a retry, or continue in a retry loop
-            print("Zoom Out Command Timeout\n")
-            return
-        
-        if (response_zoom_out.status_code == 200 and response_stop.status_code == 200):
+        if (response_zoom_out.status == 200 and response_stop.status == 200):
             print("Zoom Out successfully")
         else:
             print("Zoom Out Failure")
-            print('Response Content 1:\n',response_zoom_out.text)
-            print('Response Content 2:\n',response_stop.text)
+            print('Response Content 1:\n',response_zoom_out.data)
+            print('Response Content 2:\n',response_stop.data)
             
     def listen_command(self):
         while(True):
