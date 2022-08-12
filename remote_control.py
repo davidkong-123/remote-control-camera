@@ -16,6 +16,9 @@ camera_hostname = "192.168.100.99"
 class Controller:
     def __init__(self) -> None:
         print("Activate Camera Controller")
+
+        ##zoom level is from 0 to 36
+        self.zoom_level = 0
     
     def ping_camera(self):
         print("Ping Camera")
@@ -25,7 +28,23 @@ class Controller:
             print(camera_hostname, 'is up!')
         else:
             print(camera_hostname, 'is down!')
+
+    def set_zoom_level(self, level):
+        if self.zoom_level == level:
+            print(f"Current zoom level is {level} already")
+            return
+        elif self.zoom_level > level:
+            offset = zoom_level - level
+            for i in range(offset):
+                self.send_zoom_out_command()
+            zoom_level = level
+        else:
+            offset = level - zoom_level
+            for i in range(offset):
+                self.send_zoom_in_command()
+        print(f"Set current level to {zoom_level} successfully")
             
+
     def send_zoom_in_command(self):
         print("Send Zoom In Command")
         try:
@@ -48,11 +67,23 @@ class Controller:
         
         if (response_zoom_in.status == 200 and response_stop.status == 200):
             print("Zoom in successfully")
+            self.count += 1
+            print("zoom in count:", self.count)
         else:
             print("Zoom In Failure")
             print('Response Content 1:\n',response_zoom_in.data)
             print('Response Content 2:\n',response_stop.data)
     
+    def zoom_out_all(self):
+        for i in range(40):
+            send_zoom_out_command()
+        print("Finish zoom out all")
+
+    def zoom_in_all(self):
+        for i in range(40):
+            send_zoom_in_command()
+        print("Finish zoom in all")
+
     def send_zoom_out_command(self):
         print("Send Zoom Out Command")
         http = urllib3.PoolManager()
@@ -80,25 +111,32 @@ class Controller:
             print("Zoom Out Failure")
             print('Response Content 1:\n',response_zoom_out.data)
             print('Response Content 2:\n',response_stop.data)
+        
             
     def listen_command(self):
         while(True):
-            temp_ley = keyboard.read_key()
-            if temp_ley == "":
+            temp_key = keyboard.read_key()
+            if temp_key == "":
                 continue
-            elif temp_ley == "q":
+            elif temp_key == "q":
                 print("Quit the controller.\n")
                 break
-            elif temp_ley == "i":
+            elif temp_key == "i":
                 self.send_zoom_in_command()
-            elif temp_ley == "o":
+            elif temp_key == "o":
                 self.send_zoom_out_command()
-            elif temp_ley == "p":
+            elif temp_key == "p":
                 self.ping_camera()
-            elif temp_ley == "h":
+            elif temp_key == "a":
+                self.zoom_out_all()
+            elif temp_key == "w":
+                self.zoom_in_all()
+            elif temp_key == "h":
                 print("'p': Ping the camera.")
-                print("'i': Camera zoom in.")
-                print("'o': Camera zoom out.")
+                print("'i': Camera zoom in one level.")
+                print("'o': Camera zoom out one level.")
+                print("'a': Camera zoom in to max level.")
+                print("'w': Camera zoom out to min level.")
                 print("'q': Exit camera controller.\n")
             else:
                 print("Print 'h' to see the manual\n")
